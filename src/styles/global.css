@@ -8,6 +8,23 @@
   --color-primary-hover: var(--brand-primary-hover);
   --color-neutral-bg: var(--brand-neutral-bg);
   --color-brand-text: var(--brand-text);
+
+  /* Motion tokens: define the "feel" of animation once, reuse everywhere. */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --duration-reveal: 600ms;
+  --reveal-distance: 16px;
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--reveal-distance));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @layer base {
@@ -29,5 +46,37 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Scroll reveals
+ *
+ * Progressive enhancement:
+ *   1. The inline script in BaseLayout.astro adds `.js` to <html> before paint.
+ *   2. src/scripts/reveal.ts flips `data-reveal` -> `data-reveal="in"` on entry.
+ *   3. Only when `.js` is present is the hidden start state applied, so with
+ *      JavaScript disabled nothing is ever invisible.
+ *
+ * Usage:  <h2 data-reveal style="--reveal-delay: 100ms">…</h2>
+ * --------------------------------------------------------------------------- */
+
+/* Hidden start state. Scoped to `.js` so no-JS users always see content. */
+.js [data-reveal]:not([data-reveal='in']) {
+  opacity: 0;
+}
+
+[data-reveal='in'] {
+  animation: reveal-up var(--duration-reveal) var(--ease-out-quart) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal]:not([data-reveal='in']) {
+    opacity: 1;
+  }
+
+  [data-reveal='in'] {
+    animation: none;
   }
 }

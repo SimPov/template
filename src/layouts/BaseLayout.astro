@@ -35,6 +35,11 @@ const themeVars = {
       .map(([k, v]) => `${k}:${v}`)
       .join(';')}}`} />
     <SeoHead title={title} description={description} breadcrumbs={breadcrumbs} noindex={noindex} />
+    {/* Set the `js` flag before first paint so [data-reveal] elements are never
+        briefly visible before the observer hides them. */}
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
   </head>
   <body class="min-h-screen bg-neutral-bg text-brand-text antialiased">
     <a
@@ -48,5 +53,9 @@ const themeVars = {
       <slot />
     </main>
     <Footer />
+    {/* Bundled and loaded as a client-side script by Astro. */}
+    <script>
+      import '../scripts/reveal.ts';
+    </script>
   </body>
 </html>

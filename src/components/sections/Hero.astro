@@ -11,12 +11,22 @@ const { ctaButton, heroSecondaryCta, stats } = content;
       <p class="inline-flex rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
         Webdesign voor ondernemers in {location.addressLocality} en de Randstad
       </p>
-      <h1 class="mt-5 text-4xl font-bold tracking-tight text-balance sm:text-5xl">
+      <h1
+        data-reveal
+        class="mt-5 text-4xl font-bold tracking-tight text-balance sm:text-5xl"
+        style="--reveal-delay: 0ms"
+      >
         {site.slogan}
       </h1>
-      <p class="mt-5 max-w-xl text-lg text-brand-text/80">{site.description}</p>
+      <p
+        data-reveal
+        class="mt-5 max-w-xl text-lg text-brand-text/80"
+        style="--reveal-delay: 100ms"
+      >
+        {site.description}
+      </p>
 
-      <div class="mt-8 flex flex-wrap gap-3">
+      <div data-reveal class="mt-8 flex flex-wrap gap-3" style="--reveal-delay: 200ms">
         <a
           href={ctaButton.href}
           class="rounded-md bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-hover"
@@ -34,8 +44,12 @@ const { ctaButton, heroSecondaryCta, stats } = content;
 
     <dl class="grid grid-cols-2 gap-4">
       {
-        stats.map((stat) => (
-          <div class="rounded-lg border border-black/10 bg-neutral-bg p-6">
+        stats.map((stat, index) => (
+          <div
+            data-reveal
+            class="rounded-lg border border-black/10 bg-neutral-bg p-6"
+            style={`--reveal-delay: ${250 + index * 100}ms`}
+          >
             <dt class="sr-only">{stat.label}</dt>
             <dd class="text-3xl font-bold text-primary">{stat.value}</dd>
             <p class="mt-1 text-sm text-brand-text/75">{stat.label}</p>

@@ -18,12 +18,12 @@ const jsonLd = JSON.stringify({
 
 <section id="faq" class="scroll-mt-24 py-20">
   <div class="mx-auto max-w-3xl px-4 sm:px-6">
-    <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Veelgestelde vragen</h2>
+    <h2 data-reveal class="text-3xl font-bold tracking-tight sm:text-4xl">Veelgestelde vragen</h2>
 
     <div class="mt-10 divide-y divide-black/10">
       {
-        faq.map((item) => (
-          <details class="group py-4">
+        faq.map((item, index) => (
+          <details data-reveal class="group py-4" style={`--reveal-delay: ${index * 75}ms`}>
             <summary class="flex cursor-pointer items-center justify-between gap-4 text-left font-semibold hover:text-primary">
               {item.question}
               <span class="text-primary transition-transform group-open:rotate-45" aria-hidden="true">

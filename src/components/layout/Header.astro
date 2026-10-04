@@ -87,7 +87,8 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 </header>
 
 <script is:inline>
-  // De enige client-side JS in de hele site (~0,4 kB): het mobiele hamburgermenu.
+  // Het mobiele hamburgermenu. Het andere client-side script is src/scripts/reveal.ts
+  // (scroll-reveals), los geladen vanuit BaseLayout.astro.
   (function () {
     var toggle = document.getElementById('menu-toggle');
     var menu = document.getElementById('mobile-menu');

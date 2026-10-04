@@ -17,7 +17,7 @@ interface Props {
   title?: string;
 }
 
-const { breadcrumbs } = Astro.props;
+const { breadcrumbs, title } = Astro.props;
 
 const { site, legal, contact, location, openingHours, socials, content } = siteConfig;
 
@@ -108,7 +108,7 @@ const graph: Record<string, unknown>[] = [
     '@type': 'WebPage',
     '@id': pageId,
     url: Astro.url.href,
-    name: Astro.props.title ?? site.name,
+    name: title ?? site.name,
     isPartOf: { '@id': websiteId },
     about: { '@id': orgId },
     inLanguage: 'nl-NL',

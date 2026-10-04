@@ -1,3 +1,5 @@
+/* stylelint-disable at-rule-no-unknown */
+/* @theme is a Tailwind CSS v4 at-rule, not a standard CSS at-rule. */
 @import 'tailwindcss';
 
 @theme {
@@ -24,6 +26,8 @@
   }
 }
 
-@utility text-balance {
-  text-wrap: balance;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }

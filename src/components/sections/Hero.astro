@@ -1,0 +1,47 @@
+---
+import siteConfig from '../../config/site.config';
+
+const { site, content, location } = siteConfig;
+const { ctaButton, heroSecondaryCta, stats } = content;
+---
+
+<section class="border-b border-black/10 bg-white/50">
+  <div class="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-28">
+    <div>
+      <p class="inline-flex rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+        Webdesign voor ondernemers in {location.addressLocality} en de Randstad
+      </p>
+      <h1 class="mt-5 text-4xl font-bold tracking-tight text-balance sm:text-5xl">
+        {site.slogan}
+      </h1>
+      <p class="mt-5 max-w-xl text-lg text-brand-text/80">{site.description}</p>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a
+          href={ctaButton.href}
+          class="rounded-md bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-hover"
+        >
+          {ctaButton.label}
+        </a>
+        <a
+          href={heroSecondaryCta.href}
+          class="rounded-md border-2 border-primary px-6 py-3 font-semibold text-primary transition-colors hover:bg-primary/5"
+        >
+          {heroSecondaryCta.label}
+        </a>
+      </div>
+    </div>
+
+    <dl class="grid grid-cols-2 gap-4">
+      {
+        stats.map((stat) => (
+          <div class="rounded-lg border border-black/10 bg-neutral-bg p-6">
+            <dt class="sr-only">{stat.label}</dt>
+            <dd class="text-3xl font-bold text-primary">{stat.value}</dd>
+            <p class="mt-1 text-sm text-brand-text/75">{stat.label}</p>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>

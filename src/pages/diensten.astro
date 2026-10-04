@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProcessSection from '../components/sections/ProcessSection.astro';
+import FaqSection from '../components/sections/FaqSection.astro';
+import CtaBanner from '../components/sections/CtaBanner.astro';
+import siteConfig from '../config/site.config';
+
+const { services, ctaButton } = siteConfig.content;
+---
+
+<BaseLayout
+  title="Diensten"
+  description={`Diensten van ${siteConfig.site.name}: bedrijfswebsites, webshops, lokale SEO en onderhoud voor ondernemers.`}
+  breadcrumbs={[{ name: 'Diensten', href: '/diensten' }]}
+>
+  <section class="border-b border-black/10 bg-white/50 py-16 sm:py-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+      <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Diensten</h1>
+      <p class="mt-6 text-lg text-brand-text/80">
+        Wat wij voor je kunnen bouwen en verbeteren. Elke dienst heeft een heldere prijsindicatie, zodat je weet waar
+        je aan begint.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-16 sm:py-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <ul class="grid gap-6 md:grid-cols-2">
+        {
+          services.map((service) => (
+            <li
+              id={service.id}
+              class="flex scroll-mt-24 flex-col rounded-lg border border-black/10 bg-white/60 p-6 sm:p-8"
+            >
+              <h2 class="text-2xl font-bold text-primary">{service.title}</h2>
+              <p class="mt-3 text-brand-text/85">{service.shortDesc}</p>
+
+              <h3 class="mt-6 text-sm font-semibold uppercase tracking-wide text-brand-text/70">
+                Wat krijg je?
+              </h3>
+              <ul class="mt-3 space-y-2 text-sm text-brand-text/85">
+                {service.deliverables.map((item) => (
+                  <li class="flex gap-2">
+                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <p class="mt-6 border-t border-black/10 pt-4 text-lg font-semibold text-primary">
+                {service.priceTier}
+              </p>
+
+              <a
+                href={ctaButton.href}
+                class="mt-6 inline-block rounded-md bg-primary px-5 py-3 text-center font-semibold text-white transition-colors hover:bg-primary-hover"
+                aria-label={`Vraag een offerte aan voor ${service.title}`}
+              >
+                Offerte aanvragen voor {service.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <ProcessSection />
+  <FaqSection />
+  <CtaBanner />
+</BaseLayout>

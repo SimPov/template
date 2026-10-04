@@ -1,0 +1,33 @@
+---
+import siteConfig from '../../config/site.config';
+
+const { site, contact, content } = siteConfig;
+const { ctaButton } = content;
+---
+
+<section class="bg-primary py-16 text-white">
+  <div class="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 sm:px-6 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h2 class="text-3xl font-bold tracking-tight text-balance">Klaar voor een website die werkt?</h2>
+      <p class="mt-2 max-w-xl text-white/90">
+        Een snelle, overtuigende website voor je onderneming. Plan vrijblijvend een kennismaking.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <a
+        href={ctaButton.href}
+        class="rounded-md bg-white px-6 py-3 font-semibold text-primary transition-colors hover:bg-white/90"
+      >
+        {ctaButton.label}
+      </a>
+      <a
+        href={`tel:${contact.phone}`}
+        class="rounded-md border-2 border-white px-6 py-3 font-semibold text-white transition-colors hover:bg-white/10"
+        aria-label={`Bel ${site.name} via ${contact.phone}`}
+      >
+        {contact.phone}
+      </a>
+    </div>
+  </div>
+</section>

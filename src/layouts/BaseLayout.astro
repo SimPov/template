@@ -1,0 +1,52 @@
+---
+import '../styles/global.css';
+import siteConfig from '../config/site.config';
+import SeoHead from '../components/seo/SeoHead.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import type { Crumb } from '../components/seo/Schema.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  breadcrumbs?: Crumb[];
+  noindex?: boolean;
+}
+
+const { title, description, breadcrumbs, noindex } = Astro.props;
+const { theme } = siteConfig;
+
+// CSS-variabelen uit de config -> Tailwind theme (zie src/styles/global.css)
+const themeVars = {
+  '--brand-primary': theme.primaryColor,
+  '--brand-primary-hover': theme.primaryHover,
+  '--brand-neutral-bg': theme.neutralBg,
+  '--brand-text': theme.textColor,
+};
+---
+
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <style is:global set:html={`:root{${Object.entries(themeVars)
+      .map(([k, v]) => `${k}:${v}`)
+      .join(';')}}`} />
+    <SeoHead title={title} description={description} breadcrumbs={breadcrumbs} noindex={noindex} />
+  </head>
+  <body class="min-h-screen bg-neutral-bg text-brand-text antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white"
+    >
+      Direct naar de inhoud
+    </a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

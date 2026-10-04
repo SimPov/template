@@ -1,0 +1,137 @@
+---
+/**
+ * Genereert JSON-LD volgens de Google Local Business Documentatie.
+ * Alle waarden komen uit `site.config.ts` — geen hardcoded bedrijfsdata.
+ */
+import siteConfig from '../../config/site.config';
+
+export interface Crumb {
+  name: string;
+  href: string;
+}
+
+interface Props {
+  /** Optionele breadcrumbs voor binnenpagina's. */
+  breadcrumbs?: Crumb[];
+  /** Wordt door SeoHead.astro doorgegeven voor de WebPage-node. */
+  title?: string;
+}
+
+const { breadcrumbs } = Astro.props;
+
+const { site, legal, contact, location, openingHours, socials, content } = siteConfig;
+
+const orgId = `${site.url}/#organization`;
+const websiteId = `${site.url}/#website`;
+const pageId = `${Astro.url.origin}${Astro.url.pathname}#webpage`;
+
+const sameAs = Object.values(socials).filter((v): v is string => typeof v === 'string' && v.length > 0);
+
+const openingHoursSpecification = openingHours.map((entry) => ({
+  '@type': 'OpeningHoursSpecification',
+  dayOfWeek: entry.days,
+  opens: entry.opens,
+  closes: entry.closes,
+}));
+
+const graph: Record<string, unknown>[] = [
+  {
+    '@type': 'ProfessionalService',
+    '@id': orgId,
+    name: site.name,
+    legalName: site.legalName,
+    slogan: site.slogan,
+    description: site.description,
+    url: site.url,
+    telephone: contact.phone,
+    email: contact.email,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: location.streetAddress,
+      postalCode: location.postalCode,
+      addressLocality: location.addressLocality,
+      addressCountry: location.addressCountry,
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: location.geo.latitude,
+      longitude: location.geo.longitude,
+    },
+    areaServed: location.areaServed,
+    openingHoursSpecification,
+    sameAs,
+    vatID: legal.btw,
+    identifier: [
+      { '@type': 'PropertyValue', name: 'KvK', value: legal.kvk },
+    ],
+    priceRange: content.services[0]?.priceTier ?? '',
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      '@id': `${site.url}/#offercatalog`,
+      name: `Diensten van ${site.name}`,
+      itemListElement: content.services.map((service, index) => ({
+        '@type': 'Offer',
+        '@id': `${site.url}/#offer-${service.id}`,
+        position: index + 1,
+        name: service.title,
+        description: service.shortDesc,
+        url: `${site.url}/diensten#${service.id}`,
+        priceSpecification: {
+          '@type': 'PriceSpecification',
+          priceCurrency: 'EUR',
+          description: service.priceTier,
+        },
+        itemOffered: {
+          '@type': 'Service',
+          name: service.title,
+          description: service.shortDesc,
+        },
+      })),
+    },
+    makesOffer: content.services.map((service) => ({
+      '@type': 'Offer',
+      '@id': `${site.url}/#offer-${service.id}`,
+      name: service.title,
+      url: `${site.url}/diensten#${service.id}`,
+    })),
+  },
+  {
+    '@type': 'WebSite',
+    '@id': websiteId,
+    url: site.url,
+    name: site.name,
+    description: site.description,
+    inLanguage: 'nl-NL',
+    publisher: { '@id': orgId },
+  },
+  {
+    '@type': 'WebPage',
+    '@id': pageId,
+    url: Astro.url.href,
+    name: Astro.props.title ?? site.name,
+    isPartOf: { '@id': websiteId },
+    about: { '@id': orgId },
+    inLanguage: 'nl-NL',
+  },
+];
+
+if (breadcrumbs?.length) {
+  graph.push({
+    '@type': 'BreadcrumbList',
+    '@id': `${Astro.url.origin}${Astro.url.pathname}#breadcrumb`,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: site.url },
+      ...breadcrumbs.map((crumb, index) => ({
+        '@type': 'ListItem',
+        position: index + 2,
+        name: crumb.name,
+        item: `${site.url}${crumb.href}`,
+      })),
+    ],
+  });
+}
+
+const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
+---
+
+<script type="application/ld+json" set:html={jsonLd} />

@@ -1,0 +1,101 @@
+---
+import siteConfig from '../../config/site.config';
+
+const { content, contact } = siteConfig;
+const { navigation, ctaButton } = content;
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<header class="sticky top-0 z-40 border-b border-black/10 bg-neutral-bg/90 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+    <a href="/" class="text-lg font-bold tracking-tight text-primary" aria-label={`${siteConfig.site.name} — naar de homepage`}>
+      {siteConfig.site.name}
+    </a>
+
+    <nav class="hidden items-center gap-6 md:flex" aria-label="Hoofdnavigatie">
+      {
+        navigation.map((item) => (
+          <a
+            href={item.href}
+            aria-current={currentPath === item.href ? 'page' : undefined}
+            class:list={[
+              'text-sm font-medium transition-colors hover:text-primary',
+              currentPath === item.href ? 'text-primary' : 'text-brand-text',
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      <a
+        href={ctaButton.href}
+        class="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+      >
+        {ctaButton.label}
+      </a>
+    </nav>
+
+    <button
+      type="button"
+      id="menu-toggle"
+      class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-black/15 text-brand-text md:hidden"
+      aria-label="Open het menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
+      </svg>
+    </button>
+  </div>
+
+  <nav
+    id="mobile-menu"
+    class="hidden border-t border-black/10 bg-neutral-bg md:hidden"
+    aria-label="Mobiele navigatie"
+  >
+    <ul class="mx-auto flex max-w-6xl flex-col px-4 py-2 sm:px-6">
+      {
+        navigation.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={currentPath === item.href ? 'page' : undefined}
+              class="block rounded-md px-3 py-3 font-medium hover:bg-primary/5 hover:text-primary"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+      <li class="my-2 h-px bg-black/10" aria-hidden="true" />
+      <li>
+        <a
+          href={ctaButton.href}
+          class="block rounded-md bg-primary px-3 py-3 text-center font-semibold text-white hover:bg-primary-hover"
+        >
+          {ctaButton.label}
+        </a>
+      </li>
+      <li>
+        <a href={`tel:${contact.phone}`} class="block rounded-md px-3 py-3 text-sm hover:text-primary">
+          Bel {contact.phone}
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<script is:inline>
+  // De enige client-side JS in de hele site (~0,4 kB): het mobiele hamburgermenu.
+  (function () {
+    var toggle = document.getElementById('menu-toggle');
+    var menu = document.getElementById('mobile-menu');
+    if (!toggle || !menu) return;
+    toggle.addEventListener('click', function () {
+      var open = menu.classList.toggle('hidden') === false;
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Sluit het menu' : 'Open het menu');
+    });
+  })();
+</script>

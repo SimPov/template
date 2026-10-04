@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Values resolve to the CSS variables set in BaseLayout.astro from site.config.ts */
+  --color-primary: var(--brand-primary);
+  --color-primary-hover: var(--brand-primary-hover);
+  --color-neutral-bg: var(--brand-neutral-bg);
+  --color-brand-text: var(--brand-text);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--brand-neutral-bg);
+    color: var(--brand-text);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 3px solid var(--brand-primary);
+    outline-offset: 2px;
+  }
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}

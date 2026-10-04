@@ -13,8 +13,9 @@ interface Props {
   noindex?: boolean;
 }
 
-const { title, description, breadcrumbs, noindex } = Astro.props;
-const { theme } = siteConfig;
+const { title, description, breadcrumbs, noindex } = Astro.props as Props;
+const { theme, site } = siteConfig;
+const locale = site.locale ?? 'nl-NL';
 
 // CSS-variabelen uit de config -> Tailwind theme (zie src/styles/global.css)
 const themeVars = {
@@ -22,15 +23,16 @@ const themeVars = {
   '--brand-primary-hover': theme.primaryHover,
   '--brand-neutral-bg': theme.neutralBg,
   '--brand-text': theme.textColor,
+  ...(theme.fontFamily ? { '--brand-font': theme.fontFamily } : {}),
 };
 ---
 
 <!doctype html>
-<html lang="nl">
+<html lang={locale.split('-')[0]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {site.favicon && <link rel="icon" href={site.favicon} type="image/svg+xml" />}
     <style is:global set:html={`:root{${Object.entries(themeVars)
       .map(([k, v]) => `${k}:${v}`)
       .join(';')}}`} />

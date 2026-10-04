@@ -77,11 +77,24 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
           {ctaButton.label}
         </a>
       </li>
-      <li>
-        <a href={`tel:${contact.phone}`} class="block rounded-md px-3 py-3 text-sm hover:text-primary">
-          Bel {contact.phone}
-        </a>
-      </li>
+      {
+        contact.phone && (
+          <li>
+            <a href={`tel:${contact.phone}`} class="block rounded-md px-3 py-3 text-sm hover:text-primary">
+              Bel {contact.phone}
+            </a>
+          </li>
+        )
+      }
+      {
+        !contact.phone && contact.email && (
+          <li>
+            <a href={`mailto:${contact.email}`} class="block rounded-md px-3 py-3 text-sm break-all hover:text-primary">
+              {contact.email}
+            </a>
+          </li>
+        )
+      }
     </ul>
   </nav>
 </header>

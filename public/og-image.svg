@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Placeholder. Vervang door jouw eigen OG-afbeelding en pas `site.ogImage` aan. -->
   <rect width="1200" height="630" fill="#FDFBF7"/>
   <rect x="0" y="0" width="1200" height="14" fill="#7C0902"/>
-  <text x="80" y="300" font-family="Segoe UI, Arial, sans-serif" font-size="72" font-weight="700" fill="#1C1917">Studio Bruikbaar</text>
-  <text x="80" y="380" font-family="Segoe UI, Arial, sans-serif" font-size="36" fill="#7C0902">Websites die verkopen voor ondernemers</text>
+  <text x="80" y="300" font-family="Segoe UI, Arial, sans-serif" font-size="72" font-weight="700" fill="#1C1917">Voorbeeld Bedrijf</text>
+  <text x="80" y="380" font-family="Segoe UI, Arial, sans-serif" font-size="36" fill="#7C0902">Een heldere propositie in één zin</text>
 </svg>

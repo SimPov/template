@@ -1,7 +1,11 @@
 ---
 /**
- * Genereert JSON-LD volgens de Google Local Business Documentatie.
- * Alle waarden komen uit `site.config.ts` — geen hardcoded bedrijfsdata.
+ * Genereert JSON-LD volgens schema.org.
+ *
+ * Alles is conditioneel: alleen wat er in de config staat wordt uitgestuurd.
+ * Geen adres -> geen PostalAddress. Geen openingstijden -> geen
+ * `openingHoursSpecification`. Geen btw-nummer -> geen `vatID`. Zo blijft de
+ * output geldig voor bedrijven én voor organisaties zonder fysieke locatie.
  */
 import siteConfig from '../../config/site.config';
 
@@ -17,27 +21,41 @@ interface Props {
   title?: string;
 }
 
-const { breadcrumbs, title } = Astro.props;
+// Expliciet getypeerd zodat dit niet afhangt van props-inferentie van de
+// language server; `Astro.props` wordt anders `any` bij een koude of
+// gecachete TS-server.
+const { breadcrumbs, title } = Astro.props as Props;
 
-const { site, legal, contact, location, openingHours, socials, content } = siteConfig;
+const { site, business, legal, contact, location, openingHours, socials, content } = siteConfig;
 
 const orgId = `${site.url}/#organization`;
 const websiteId = `${site.url}/#website`;
 const pageId = `${Astro.url.origin}${Astro.url.pathname}#webpage`;
+const locale = site.locale ?? 'nl-NL';
+const currency = business.currency;
 
 const sameAs = Object.values(socials).filter((v): v is string => typeof v === 'string' && v.length > 0);
 
-const openingHoursSpecification = openingHours.map((entry) => ({
+const openingHoursSpecification = (openingHours ?? []).map((entry) => ({
   '@type': 'OpeningHoursSpecification',
   dayOfWeek: entry.days,
   opens: entry.opens,
   closes: entry.closes,
 }));
 
-const graph: Record<string, unknown>[] = [
-  {
-    '@type': 'ProfessionalService',
-    '@id': orgId,
+// Geef alleen een veld mee als er daadwerkelijk iets te zeggen valt.
+function pick<T extends Record<string, unknown>>(source: T): Partial<T> {
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(source)) {
+    if (value !== undefined && value !== null && value !== '') result[key] = value;
+  }
+  return result as Partial<T>;
+}
+
+const organization: Record<string, unknown> = {
+  '@type': business.schemaType ?? 'Organization',
+  '@id': orgId,
+  ...pick({
     name: site.name,
     legalName: site.legalName,
     slogan: site.slogan,
@@ -45,63 +63,88 @@ const graph: Record<string, unknown>[] = [
     url: site.url,
     telephone: contact.phone,
     email: contact.email,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: location.streetAddress,
-      postalCode: location.postalCode,
-      addressLocality: location.addressLocality,
-      addressCountry: location.addressCountry,
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: location.geo.latitude,
-      longitude: location.geo.longitude,
-    },
-    areaServed: location.areaServed,
-    openingHoursSpecification,
-    sameAs,
-    vatID: legal.btw,
-    identifier: [
-      { '@type': 'PropertyValue', name: 'KvK', value: legal.kvk },
-    ],
-    priceRange: content.services[0]?.priceTier ?? '',
-    hasOfferCatalog: {
-      '@type': 'OfferCatalog',
-      '@id': `${site.url}/#offercatalog`,
-      name: `Diensten van ${site.name}`,
-      itemListElement: content.services.map((service, index) => ({
-        '@type': 'Offer',
-        '@id': `${site.url}/#offer-${service.id}`,
-        position: index + 1,
-        name: service.title,
-        description: service.shortDesc,
-        url: `${site.url}/diensten#${service.id}`,
-        priceSpecification: {
-          '@type': 'PriceSpecification',
-          priceCurrency: 'EUR',
-          description: service.priceTier,
+    vatID: legal?.btw,
+  }),
+  ...(location
+    ? pick({
+        address: {
+          '@type': 'PostalAddress',
+          ...pick({
+            streetAddress: location.streetAddress,
+            postalCode: location.postalCode,
+            addressLocality: location.addressLocality,
+            addressCountry: location.addressCountry,
+          }),
         },
-        itemOffered: {
-          '@type': 'Service',
-          name: service.title,
-          description: service.shortDesc,
+      })
+    : {}),
+  ...(location?.geo
+    ? {
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: location.geo.latitude,
+          longitude: location.geo.longitude,
         },
-      })),
-    },
-    makesOffer: content.services.map((service) => ({
+      }
+    : {}),
+  ...(location?.areaServed?.length ? { areaServed: location.areaServed } : {}),
+  ...(openingHoursSpecification.length > 0 ? { openingHoursSpecification } : {}),
+  ...(sameAs.length > 0 ? { sameAs } : {}),
+  ...(legal?.kvk
+    ? {
+        identifier: [{ '@type': 'PropertyValue', name: 'KvK', value: legal.kvk }],
+      }
+    : {}),
+  ...(business.priceRange ? { priceRange: business.priceRange } : {}),
+};
+
+// Een offer-catalogus is alleen zinvol als er items met prijs- of detailinfo zijn.
+const featureItems = content.features?.items ?? [];
+if (featureItems.length > 0) {
+  const detailHref = content.features?.detailPageHref;
+  organization.hasOfferCatalog = {
+    '@type': 'OfferCatalog',
+    '@id': `${site.url}/#offercatalog`,
+    name: content.features?.heading ?? site.name,
+    itemListElement: featureItems.map((feature, index) => ({
       '@type': 'Offer',
-      '@id': `${site.url}/#offer-${service.id}`,
-      name: service.title,
-      url: `${site.url}/diensten#${service.id}`,
+      '@id': `${site.url}/#offer-${feature.id}`,
+      position: index + 1,
+      name: feature.title,
+      description: feature.shortDesc,
+      ...(detailHref ? { url: `${site.url}${detailHref}#${feature.id}` } : {}),
+      ...(currency && feature.meta
+        ? {
+            priceSpecification: {
+              '@type': 'PriceSpecification',
+              priceCurrency: currency,
+              description: feature.meta,
+            },
+          }
+        : {}),
+      itemOffered: {
+        '@type': 'Service',
+        name: feature.title,
+        description: feature.shortDesc,
+      },
     })),
-  },
+  };
+  organization.makesOffer = featureItems.map((feature) => ({
+    '@type': 'Offer',
+    '@id': `${site.url}/#offer-${feature.id}`,
+    name: feature.title,
+  }));
+}
+
+const graph: Record<string, unknown>[] = [
+  organization,
   {
     '@type': 'WebSite',
     '@id': websiteId,
     url: site.url,
     name: site.name,
     description: site.description,
-    inLanguage: 'nl-NL',
+    inLanguage: locale,
     publisher: { '@id': orgId },
   },
   {
@@ -111,7 +154,7 @@ const graph: Record<string, unknown>[] = [
     name: title ?? site.name,
     isPartOf: { '@id': websiteId },
     about: { '@id': orgId },
-    inLanguage: 'nl-NL',
+    inLanguage: locale,
   },
 ];
 

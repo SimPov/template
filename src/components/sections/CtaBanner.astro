@@ -3,15 +3,18 @@ import siteConfig from '../../config/site.config';
 
 const { site, contact, content } = siteConfig;
 const { ctaButton } = content;
+// Tweede contactmoment is optioneel: valt terug van telefoon naar e-mail.
+const secondaryLabel = contact.phone ?? contact.email;
+const secondaryHref = contact.phone ? `tel:${contact.phone}` : `mailto:${contact.email}`;
+const ctaHeading = content.ctaHeading ?? 'Klaar om samen te starten?';
+const ctaIntro = content.ctaIntro ?? `Neem vrijblijvend contact op met ${site.name}.`;
 ---
 
 <section class="bg-primary py-16 text-white">
   <div class="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 sm:px-6 md:flex-row md:items-center md:justify-between">
     <div data-reveal>
-      <h2 class="text-3xl font-bold tracking-tight text-balance">Klaar voor een website die werkt?</h2>
-      <p class="mt-2 max-w-xl text-white/90">
-        Een snelle, overtuigende website voor je onderneming. Plan vrijblijvend een kennismaking.
-      </p>
+      <h2 class="text-3xl font-bold tracking-tight text-balance">{ctaHeading}</h2>
+      <p class="mt-2 max-w-xl text-white/90">{ctaIntro}</p>
     </div>
 
     <div data-reveal class="flex flex-wrap gap-3" style="--reveal-delay: 150ms">
@@ -21,13 +24,17 @@ const { ctaButton } = content;
       >
         {ctaButton.label}
       </a>
-      <a
-        href={`tel:${contact.phone}`}
-        class="rounded-md border-2 border-white px-6 py-3 font-semibold text-white transition-colors hover:bg-white/10"
-        aria-label={`Bel ${site.name} via ${contact.phone}`}
-      >
-        {contact.phone}
-      </a>
+      {
+        secondaryLabel && (
+          <a
+            href={secondaryHref}
+            class="rounded-md border-2 border-white px-6 py-3 font-semibold text-white transition-colors hover:bg-white/10"
+            aria-label={`Neem contact op via ${secondaryLabel}`}
+          >
+            {secondaryLabel}
+          </a>
+        )
+      }
     </div>
   </div>
 </section>

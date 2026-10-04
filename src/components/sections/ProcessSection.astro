@@ -1,38 +1,47 @@
 ---
 import siteConfig from '../../config/site.config';
 
-const { process: steps } = siteConfig.content;
+const process = siteConfig.content.process;
+const steps = process?.items ?? [];
+// De stapnummers komen uit de volgorde; `step` hoeft niet in de config te staan.
+const numbered = steps.map((step, index) => ({ ...step, step: index + 1 }));
 ---
 
-<section id="werkwijze" class="scroll-mt-24 border-y border-black/10 bg-white/50 py-20">
-  <div class="mx-auto max-w-6xl px-4 sm:px-6">
-    <h2 data-reveal class="text-3xl font-bold tracking-tight sm:text-4xl">Onze werkwijze</h2>
-    <p data-reveal class="mt-3 max-w-2xl text-brand-text/80" style="--reveal-delay: 100ms">
-      Duidelijke stappen, vaste momenten van oplevering en nooit meer werk dan afgesproken.
-    </p>
+{
+  process && numbered.length > 0 && (
+    <section id="werkwijze" class="scroll-mt-24 border-y border-black/10 bg-white/50 py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <h2 data-reveal class="text-3xl font-bold tracking-tight sm:text-4xl">
+          {process.heading}
+        </h2>
+        {process.intro && (
+          <p data-reveal class="mt-3 max-w-2xl text-brand-text/80" style="--reveal-delay: 100ms">
+            {process.intro}
+          </p>
+        )}
 
-    <ol class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {
-        steps.map((step, index) => (
-          <li
-            data-reveal
-            class="rounded-lg border border-black/10 bg-neutral-bg p-6"
-            style={`--reveal-delay: ${index * 100}ms`}
-          >
-            <span
-              class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-lg font-bold text-white"
-              aria-hidden="true"
+        <ol class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {numbered.map((step, index) => (
+            <li
+              data-reveal
+              class="rounded-lg border border-black/10 bg-neutral-bg p-6"
+              style={`--reveal-delay: ${index * 100}ms`}
             >
-              {step.step}
-            </span>
-            <h3 class="mt-4 text-lg font-semibold text-primary">
-              <span class="sr-only">Stap {step.step}: </span>
-              {step.title}
-            </h3>
-            <p class="mt-2 text-sm text-brand-text/80">{step.description}</p>
-          </li>
-        ))
-      }
-    </ol>
-  </div>
-</section>
+              <span
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-lg font-bold text-white"
+                aria-hidden="true"
+              >
+                {step.step}
+              </span>
+              <h3 class="mt-4 text-lg font-semibold text-primary">
+                <span class="sr-only">Stap {step.step}: </span>
+                {step.title}
+              </h3>
+              <p class="mt-2 text-sm text-brand-text/80">{step.description}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )
+}

@@ -1,16 +1,24 @@
 ---
+/**
+ * Hero. De badge en de secundaire CTA zijn optioneel; de slogan en
+ * beschrijving komen uit de config.
+ */
 import siteConfig from '../../config/site.config';
 
-const { site, content, location } = siteConfig;
-const { ctaButton, heroSecondaryCta, stats } = content;
+const { site, content } = siteConfig;
+const { ctaButton, heroSecondaryCta, hero, stats } = content;
 ---
 
 <section class="border-b border-black/10 bg-white/50">
   <div class="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-28">
     <div>
-      <p class="inline-flex rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-        Webdesign voor ondernemers in {location.addressLocality} en de Randstad
-      </p>
+      {
+        hero.badge && (
+          <p class="inline-flex rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+            {hero.badge}
+          </p>
+        )
+      }
       <h1
         data-reveal
         class="mt-5 text-4xl font-bold tracking-tight text-balance sm:text-5xl"
@@ -33,29 +41,35 @@ const { ctaButton, heroSecondaryCta, stats } = content;
         >
           {ctaButton.label}
         </a>
-        <a
-          href={heroSecondaryCta.href}
-          class="rounded-md border-2 border-primary px-6 py-3 font-semibold text-primary transition-colors hover:bg-primary/5"
-        >
-          {heroSecondaryCta.label}
-        </a>
+        {
+          heroSecondaryCta && (
+            <a
+              href={heroSecondaryCta.href}
+              class="rounded-md border-2 border-primary px-6 py-3 font-semibold text-primary transition-colors hover:bg-primary/5"
+            >
+              {heroSecondaryCta.label}
+            </a>
+          )
+        }
       </div>
     </div>
 
-    <dl class="grid grid-cols-2 gap-4">
-      {
-        stats.map((stat, index) => (
-          <div
-            data-reveal
-            class="rounded-lg border border-black/10 bg-neutral-bg p-6"
-            style={`--reveal-delay: ${250 + index * 100}ms`}
-          >
-            <dt class="sr-only">{stat.label}</dt>
-            <dd class="text-3xl font-bold text-primary">{stat.value}</dd>
-            <p class="mt-1 text-sm text-brand-text/75">{stat.label}</p>
-          </div>
-        ))
-      }
-    </dl>
+    {
+      stats && stats.length > 0 && (
+        <dl class="grid grid-cols-2 gap-4">
+          {stats.map((stat, index) => (
+            <div
+              data-reveal
+              class="rounded-lg border border-black/10 bg-neutral-bg p-6"
+              style={`--reveal-delay: ${250 + index * 100}ms`}
+            >
+              <dt class="sr-only">{stat.label}</dt>
+              <dd class="text-3xl font-bold text-primary">{stat.value}</dd>
+              <p class="mt-1 text-sm text-brand-text/75">{stat.label}</p>
+            </div>
+          ))}
+        </dl>
+      )
+    }
   </div>
 </section>

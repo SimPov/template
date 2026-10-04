@@ -1,38 +1,52 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteConfig from '../config/site.config';
+import { DAY_NAMES_NL_CAPITALIZED } from '../config/site.types';
 
-const { site, legal, contact, location, openingHours, socials } = siteConfig;
+const { site, legal, contact, location, openingHours, socials, content } = siteConfig;
 
-const DAYS: Record<string, string> = {
-  Monday: 'Maandag',
-  Tuesday: 'Dinsdag',
-  Wednesday: 'Woensdag',
-  Thursday: 'Donderdag',
-  Friday: 'Vrijdag',
-  Saturday: 'Zaterdag',
-  Sunday: 'Zondag',
-};
+const page = content.contactPage;
+const meta = content.pages.contact;
+const features = content.features?.items ?? [];
+const featureOptions = features.map((feature) => ({ id: feature.id, title: feature.title }));
 
 const socialLabels: Record<string, string> = {
   linkedin: 'LinkedIn',
+  instagram: 'Instagram',
+  facebook: 'Facebook',
+  x: 'X',
+  youtube: 'YouTube',
+  github: 'GitHub',
   googleMaps: 'Google Maps',
   kvkRegistry: 'KvK-register',
-  instagram: 'Instagram',
+  mastodon: 'Mastodon',
 };
+const socialEntries = Object.entries(socials).filter(([, value]) => Boolean(value));
+const googleMapsUrl = socials.googleMaps;
+const legalName = site.legalName ?? site.name;
+
+const description = [
+  meta?.description ?? `Contactgegevens van ${site.name}.`,
+  legal?.kvk ? `KvK ${legal.kvk}.` : '',
+  legal?.btw ? `Btw ${legal.btw}.` : '',
+]
+  .filter(Boolean)
+  .join(' ');
 ---
 
 <BaseLayout
-  title="Contact"
-  description={`Neem contact op met ${site.name}. Bel, mail of plan direct een kennismaking. KvK ${legal.kvk}, btw ${legal.btw}.`}
-  breadcrumbs={[{ name: 'Contact', href: '/contact' }]}
+  title={meta?.title ?? page?.title ?? 'Contact'}
+  description={description}
+  breadcrumbs={meta ? [{ name: meta.title, href: '/contact' }] : undefined}
 >
   <section class="border-b border-black/10 bg-white/50 py-16 sm:py-20">
     <div class="mx-auto max-w-3xl px-4 sm:px-6">
-      <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Contact</h1>
-      <p class="mt-6 text-lg text-brand-text/80">
-        Je vraag staat klaar, of je nu belt, mailt of direct een moment inplant. We reageren binnen één werkdag.
-      </p>
+      <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
+        {meta?.title ?? page?.title ?? 'Contact'}
+      </h1>
+      {(meta?.intro ?? page?.intro) && (
+        <p class="mt-6 text-lg text-brand-text/80">{meta?.intro ?? page?.intro}</p>
+      )}
     </div>
   </section>
 
@@ -40,100 +54,163 @@ const socialLabels: Record<string, string> = {
     <div class="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-5">
       <!-- Linkerkolom: alle NAP- en bedrijfsgegevens zichtbaar (Google-vereiste) -->
       <div class="lg:col-span-2">
-        <h2 class="text-2xl font-bold tracking-tight">Bedrijfsgegevens</h2>
+        <h2 class="text-2xl font-bold tracking-tight">{page?.columnsHeading ?? 'Bedrijfsgegevens'}</h2>
 
         <div class="mt-6 space-y-8">
-          <div>
-            <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-text/70">Adres</h3>
-            <address class="mt-2 not-italic">
-              <a href={socials.googleMaps} target="_blank" rel="noopener" class="hover:text-primary" aria-label={`Bekijk ${site.name} op Google Maps (opent in een nieuw tabblad)`}>
-                <strong class="font-semibold">{site.legalName}</strong><br />
-                {location.streetAddress}<br />
-                {location.postalCode} {location.addressLocality}<br />
-                {location.addressCountry}
-              </a>
-            </address>
-          </div>
-
-          <div>
-            <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-text/70">Telefoon &amp; e-mail</h3>
-            <p class="mt-2 space-y-1">
-              <a href={`tel:${contact.phone}`} class="block font-medium hover:text-primary">{contact.phone}</a>
-              <a href={`mailto:${contact.email}`} class="block break-all hover:text-primary">{contact.email}</a>
-            </p>
-          </div>
-
-          <div>
-            <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-text/70">Openingstijden</h3>
-            <dl class="mt-2 space-y-1">
-              {
-                openingHours.map((entry) => (
-                  <div class="flex justify-between gap-4">
-                    <dt class="text-brand-text/80">{entry.days.map((day) => DAYS[day] ?? day).join(', ')}</dt>
-                    <dd class="font-medium tabular-nums">{entry.opens} – {entry.closes}</dd>
-                  </div>
-                ))
-              }
-            </dl>
-          </div>
-
-          <div>
-            <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-text/70">Bedrijfsregistratie</h3>
-            <dl class="mt-2 space-y-1">
-              <div class="flex justify-between gap-4">
-                <dt class="text-brand-text/80">KvK-nummer</dt>
-                <dd class="font-medium">{legal.kvk}</dd>
-              </div>
-              <div class="flex justify-between gap-4">
-                <dt class="text-brand-text/80">Btw-nummer</dt>
-                <dd class="font-medium">{legal.btw}</dd>
-              </div>
-              <div class="flex justify-between gap-4">
-                <dt class="text-brand-text/80">Werkgebied</dt>
-                <dd class="text-right font-medium">{location.areaServed.join(', ')}</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div>
-            <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-text/70">Volg ons</h3>
-            <ul class="mt-2 space-y-1">
-              {
-                Object.entries(socials).map(([key, url]) => (
-                  <li>
-                    <a href={url} target="_blank" rel="me noopener" class="hover:text-primary">
-                      {socialLabels[key] ?? key}
+          {
+            location && (
+              <div>
+                <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-text/70">Adres</h3>
+                <address class="mt-2 not-italic">
+                  {googleMapsUrl ? (
+                    <a
+                      href={googleMapsUrl}
+                      target="_blank"
+                      rel="noopener"
+                      class="hover:text-primary"
+                      aria-label={`Bekijk ${site.name} op Google Maps (opent in een nieuw tabblad)`}
+                    >
+                      <strong class="font-semibold">{legalName}</strong>
+                      <br />
+                      {location.streetAddress}
+                      <br />
+                      {[location.postalCode, location.addressLocality].filter(Boolean).join(' ')}
+                      {location.addressCountry && <><br />{location.addressCountry}</>}
                     </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
+                  ) : (
+                    <>
+                      <strong class="font-semibold">{legalName}</strong>
+                      <br />
+                      {location.streetAddress}
+                      <br />
+                      {[location.postalCode, location.addressLocality].filter(Boolean).join(' ')}
+                      {location.addressCountry && <><br />{location.addressCountry}</>}
+                    </>
+                  )}
+                </address>
+              </div>
+            )
+          }
+
+          {
+            (contact.phone || contact.email) && (
+              <div>
+                <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-text/70">
+                  Telefoon &amp; e-mail
+                </h3>
+                <p class="mt-2 space-y-1">
+                  {contact.phone && (
+                    <a href={`tel:${contact.phone}`} class="block font-medium hover:text-primary">
+                      {contact.phone}
+                    </a>
+                  )}
+                  {contact.email && (
+                    <a href={`mailto:${contact.email}`} class="block break-all hover:text-primary">
+                      {contact.email}
+                    </a>
+                  )}
+                </p>
+              </div>
+            )
+          }
+
+          {
+            (openingHours?.length ?? 0) > 0 && (
+              <div>
+                <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-text/70">Openingstijden</h3>
+                <dl class="mt-2 space-y-1">
+                  {openingHours?.map((entry) => (
+                    <div class="flex justify-between gap-4">
+                      <dt class="text-brand-text/80">
+                        {entry.days.map((day) => DAY_NAMES_NL_CAPITALIZED[day] ?? day).join(', ')}
+                      </dt>
+                      <dd class="font-medium tabular-nums">{entry.opens} – {entry.closes}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )
+          }
+
+          {
+            (legal?.kvk || legal?.btw || location?.areaServed?.length) && (
+              <div>
+                <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-text/70">
+                  Bedrijfsregistratie
+                </h3>
+                <dl class="mt-2 space-y-1">
+                  {legal?.kvk && (
+                    <div class="flex justify-between gap-4">
+                      <dt class="text-brand-text/80">KvK-nummer</dt>
+                      <dd class="font-medium">{legal.kvk}</dd>
+                    </div>
+                  )}
+                  {legal?.btw && (
+                    <div class="flex justify-between gap-4">
+                      <dt class="text-brand-text/80">Btw-nummer</dt>
+                      <dd class="font-medium">{legal.btw}</dd>
+                    </div>
+                  )}
+                  {location?.areaServed?.length && (
+                    <div class="flex justify-between gap-4">
+                      <dt class="text-brand-text/80">Werkgebied</dt>
+                      <dd class="text-right font-medium">{location.areaServed.join(', ')}</dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            )
+          }
+
+          {
+            socialEntries.length > 0 && (
+              <div>
+                <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-text/70">Volg ons</h3>
+                <ul class="mt-2 space-y-1">
+                  {socialEntries.map(([key, url]) => (
+                    <li>
+                      <a href={url} target="_blank" rel="me noopener" class="hover:text-primary">
+                        {socialLabels[key] ?? key}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
         </div>
       </div>
 
       <!-- Rechterkolom: B2B-contactformulier + directe boeking -->
       <div class="lg:col-span-3">
-        <h2 class="text-2xl font-bold tracking-tight">Stuur ons een bericht</h2>
-        <p class="mt-2 text-sm text-brand-text/75">
-          Vul het formulier in en wij nemen binnen één werkdag contact op. Liever meteen schakelen?
-        </p>
+        <h2 class="text-2xl font-bold tracking-tight">{page?.formHeading ?? 'Stuur een bericht'}</h2>
+        {
+          contact.formIntro && (
+            <p class="mt-2 text-sm text-brand-text/75">{contact.formIntro}</p>
+          )
+        }
 
-        <a
-          href={contact.bookingUrl}
-          target="_blank"
-          rel="noopener"
-          class="mt-5 inline-block rounded-md border-2 border-primary px-5 py-3 font-semibold text-primary transition-colors hover:bg-primary/5"
-          aria-label="Plan direct een kennismaking via onze online agenda (opent in een nieuw tabblad)"
-        >
-          Plan direct een kennismaking
-        </a>
+        {
+          contact.bookingUrl && (
+            <a
+              href={contact.bookingUrl}
+              target="_blank"
+              rel="noopener"
+              class="mt-5 inline-block rounded-md border-2 border-primary px-5 py-3 font-semibold text-primary transition-colors hover:bg-primary/5"
+              aria-label="Plan direct een afspraak via onze online agenda (opent in een nieuw tabblad)"
+            >
+              Plan direct een afspraak
+            </a>
+          )
+        }
 
-        <form
-          method="POST"
-          action={contact.formEndpoint}
-          class="mt-8 grid gap-5 rounded-lg border border-black/10 bg-white/60 p-6 sm:p-8"
-        >
+        {
+          contact.formEndpoint && (
+            <form
+              method="POST"
+              action={contact.formEndpoint}
+              class="mt-8 grid gap-5 rounded-lg border border-black/10 bg-white/60 p-6 sm:p-8"
+            >
           <div class="grid gap-5 sm:grid-cols-2">
             <div>
               <label for="naam" class="block text-sm font-medium">Naam *</label>
@@ -156,29 +233,44 @@ const socialLabels: Record<string, string> = {
             </div>
           </div>
 
-          <div>
-            <label for="dienst" class="block text-sm font-medium">Waar heb je hulp bij?</label>
-            <select id="dienst" name="dienst" class="mt-1 w-full rounded-md border border-black/20 bg-neutral-bg px-3 py-2.5">
-              <option value="">Kies een dienst (optioneel)</option>
-              {siteConfig.content.services.map((service) => <option value={service.id}>{service.title}</option>)}
-              <option value="anders">Iets anders</option>
-            </select>
-          </div>
+          {
+            featureOptions.length > 0 && (
+              <div>
+                <label for="dienst" class="block text-sm font-medium">Waar heb je hulp bij?</label>
+                <select id="dienst" name="dienst" class="mt-1 w-full rounded-md border border-black/20 bg-neutral-bg px-3 py-2.5">
+                  <option value="">Kies een onderwerp (optioneel)</option>
+                  {featureOptions.map((option) => (
+                    <option value={option.id}>{option.title}</option>
+                  ))}
+                  <option value="anders">Iets anders</option>
+                </select>
+              </div>
+            )
+          }
 
           <div>
             <label for="bericht" class="block text-sm font-medium">Je bericht *</label>
             <textarea id="bericht" name="bericht" rows={5} required placeholder="Vertel kort wat je wilt bereiken." class="mt-1 w-full rounded-md border border-black/20 bg-neutral-bg px-3 py-2.5"></textarea>
           </div>
 
-          <p class="text-xs text-brand-text/70">
-            Door te versturen ga je akkoord met onze
-            <a href={legal.privacyPolicyUrl} class="underline underline-offset-2 hover:text-primary">privacyverklaring</a>.
-          </p>
+          {
+            legal?.privacyPolicyUrl && (
+              <p class="text-xs text-brand-text/70">
+                Door te versturen ga je akkoord met onze
+                <a href={legal.privacyPolicyUrl} class="underline underline-offset-2 hover:text-primary">
+                  privacyverklaring
+                </a>
+                .
+              </p>
+            )
+          }
 
-          <button type="submit" class="rounded-md bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-hover">
-            Bericht versturen
-          </button>
-        </form>
+              <button type="submit" class="rounded-md bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-hover">
+                Bericht versturen
+              </button>
+            </form>
+          )
+        }
       </div>
     </div>
   </section>

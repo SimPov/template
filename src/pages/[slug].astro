@@ -1,0 +1,62 @@
+---
+/**
+ * Generieke contentpagina: één route voor elke pagina in
+ * `content.extraPages`. Voeg een item toe in de config en de pagina bestaat.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBanner from '../components/sections/CtaBanner.astro';
+import siteConfig from '../config/site.config';
+import type { ExtraPage } from '../config/site.types';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  const pages = siteConfig.content.extraPages ?? [];
+  return pages.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+interface Props {
+  page: ExtraPage;
+}
+
+// Expliciet getypeerd, zodat dit niet afhangt van props-inferentie.
+const { page } = Astro.props as Props;
+
+// `body` accepteert alinea's of blokken met een optionele kop.
+type Block = string | { heading?: string; text: string };
+const blocks: Block[] = Array.isArray(page.body) ? page.body : [];
+---
+
+<BaseLayout
+  title={page.title}
+  description={page.description}
+  breadcrumbs={[{ name: page.title, href: `/${page.slug}` }]}
+>
+  <section class="border-b border-black/10 bg-white/50 py-16 sm:py-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+      <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">{page.title}</h1>
+      {page.intro && <p class="mt-6 text-lg text-brand-text/80">{page.intro}</p>}
+    </div>
+  </section>
+
+  <section class="py-16 sm:py-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+      <div class="space-y-6 text-brand-text/85">
+        {
+          blocks.map((block) =>
+            typeof block === 'string' ? (
+              <p>{block}</p>
+            ) : (
+              <>
+                {block.heading && <h2 class="text-2xl font-bold tracking-tight">{block.heading}</h2>}
+                <p>{block.text}</p>
+              </>
+            )
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <CtaBanner />
+</BaseLayout>

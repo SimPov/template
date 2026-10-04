@@ -6,7 +6,7 @@ interface Props {
   /** Titel van de pagina, zonder de site-suffix. */
   title: string;
   description?: string;
-  /** Pad van de OG-afbeelding in /public. */
+  /** Pad van de OG-afbeelding in /public. Valt terug op `site.ogImage`. */
   image?: string;
   breadcrumbs?: Crumb[];
   noindex?: boolean;
@@ -15,43 +15,58 @@ interface Props {
 const {
   title,
   description = siteConfig.site.description,
-  image = '/og-image.svg',
+  image,
   breadcrumbs,
   noindex = false,
-} = Astro.props;
+} = Astro.props as Props;
 
 const { site } = siteConfig;
+
+// 'nl-NL' -> 'nl_NL' voor OpenGraph.
+const ogLocale = (site.locale ?? 'nl-NL').replace('-', '_');
 
 // Google SEO Starter Guide template: [Pagina Titel] | Name – Slogan
 const fullTitle = title === site.name
   ? `${site.name} – ${site.slogan}`
   : `${title} | ${site.name} – ${site.slogan}`;
 
-// Canonical: Astro.site (uit astro.config) + het huidige pathname
-const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site ?? site.url).href;
-const ogImage = new URL(image, Astro.site ?? site.url).href;
+// `Astro.site` is deprecated (and `Astro.generator` throws in Astro 8).
+// `import.meta.env.SITE` comes from `site` in astro.config.mjs and works
+// in every context, including during static path generation.
+const siteBase = import.meta.env.SITE || siteConfig.site.url;
+
+// Canonical: de site-basis + het huidige pathname
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', siteBase).href;
+const ogImage = image ? new URL(image, siteBase).href : undefined;
 ---
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
 <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'} />
-<meta name="author" content={siteConfig.site.legalName} />
-<meta name="generator" content={Astro.generator} />
+<meta name="author" content={site.legalName ?? site.name} />
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={site.name} />
-<meta property="og:locale" content="nl_NL" />
+<meta property="og:locale" content={ogLocale} />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
-<meta property="og:image" content={ogImage} />
-<meta property="og:image:alt" content={`${site.name} – ${site.slogan}`} />
+{
+  ogImage && (
+    <>
+      <meta property="og:image" content={ogImage} />
+      <meta property="og:image:alt" content={`${site.name} – ${site.slogan}`} />
+    </>
+  )
+}
 
-<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
-<meta name="twitter:image" content={ogImage} />
+{
+  ogImage && <meta name="twitter:image" content={ogImage} />
+}
 
 <link rel="sitemap" href="/sitemap-index.xml" />
 

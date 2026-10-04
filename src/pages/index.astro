@@ -1,21 +1,39 @@
 ---
+/**
+ * De homepage is een lijst: `content.sections` bepaalt welke secties in
+ * welke volgorde verschijnen. Verwijder een sleutel of leeg de bijbehorende
+ * content en de sectie valt automatisch weg.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
+import siteConfig from '../config/site.config';
 import Hero from '../components/sections/Hero.astro';
-import ServicesSection from '../components/sections/ServicesSection.astro';
+import FeaturesSection from '../components/sections/FeaturesSection.astro';
 import ProcessSection from '../components/sections/ProcessSection.astro';
-import CasesSection from '../components/sections/CasesSection.astro';
+import WorkSection from '../components/sections/WorkSection.astro';
 import TestimonialsSection from '../components/sections/TestimonialsSection.astro';
 import FaqSection from '../components/sections/FaqSection.astro';
 import CtaBanner from '../components/sections/CtaBanner.astro';
-import siteConfig from '../config/site.config';
+import type { SectionKey } from '../config/site.types';
+
+const { site, content } = siteConfig;
+
+// Astro-componenten zijn classes; het typecast houdt de union in één plek.
+type SectionComponent = typeof Hero;
+
+const sectionComponents: Record<SectionKey, SectionComponent> = {
+  hero: Hero,
+  features: FeaturesSection as SectionComponent,
+  process: ProcessSection as SectionComponent,
+  work: WorkSection as SectionComponent,
+  testimonials: TestimonialsSection as SectionComponent,
+  faq: FaqSection as SectionComponent,
+  cta: CtaBanner as SectionComponent,
+};
 ---
 
-<BaseLayout title={siteConfig.site.name} description={siteConfig.site.description}>
-  <Hero />
-  <ServicesSection />
-  <ProcessSection />
-  <CasesSection />
-  <TestimonialsSection />
-  <FaqSection />
-  <CtaBanner />
+<BaseLayout title={site.name} description={site.description}>
+  {content.sections.map((key) => {
+    const Component = sectionComponents[key];
+    return Component ? <Component /> : null;
+  })}
 </BaseLayout>

@@ -1,115 +1,117 @@
 ---
+/**
+ * Over-ons-pagina. Alle teksten komen uit `content.about`; ontbrekende blokken
+ * (missie, waarden, team) worden overgeslagen. Route blijft `/over-ons`.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CtaBanner from '../components/sections/CtaBanner.astro';
 import siteConfig from '../config/site.config';
 
-const { team, stats } = siteConfig.content;
-const { site } = siteConfig;
-
-const values = [
-  {
-    title: 'Duidelijkheid boven jargon',
-    description: 'Je weet altijd wat we doen, waarom we het doen en wat het oplevert. Geen technische verhalen die niemand begrijpt.',
-  },
-  {
-    title: 'Snel is een feature',
-    description: 'Een website die traag is, verliest bezoekers. Wij bouwen lichtgewicht en meten de laadtijd bij elke oplevering.',
-  },
-  {
-    title: 'Toegankelijk voor iedereen',
-    description: 'Goed leesbaar, navigeerbaar met je toetsenbord en begrijpelijk ook zonder beperkingen. Vanaf het begin meegebouwd.',
-  },
-  {
-    title: 'Langetermijnrelatie',
-    description: 'Wij leveren geen project weg en verdwijnen. Je kunt altijd bij ons terecht met vragen en nieuwe plannen.',
-  },
-];
+const { site, content } = siteConfig;
+const meta = content.pages['over-ons'];
+const about = content.about;
+const stats = content.stats ?? [];
+const values = about?.values?.items ?? [];
+const team = about?.team?.items ?? [];
 ---
 
 <BaseLayout
-  title="Over ons"
-  description={`Maak kennis met ${site.name}: het team achter snelle, overtuigende websites voor zzp'ers en kleine bedrijven.`}
-  breadcrumbs={[{ name: 'Over ons', href: '/over-ons' }]}
+  title={meta?.title ?? 'Over ons'}
+  description={meta?.description}
+  breadcrumbs={meta ? [{ name: meta.title, href: '/over-ons' }] : undefined}
 >
   <section class="border-b border-black/10 bg-white/50 py-16 sm:py-20">
     <div class="mx-auto max-w-3xl px-4 sm:px-6">
-      <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Over {site.name}</h1>
-      <p class="mt-6 text-lg text-brand-text/80">{siteConfig.site.description}</p>
+      <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
+        {about?.team ? `Over ${site.name}` : (meta?.title ?? 'Over ons')}
+      </h1>
+      <p class="mt-6 text-lg text-brand-text/80">{site.description}</p>
     </div>
   </section>
 
-  <section class="py-16 sm:py-20">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6">
-      <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Onze missie</h2>
-      <div class="mt-6 space-y-4 text-brand-text/85">
-        <p>
-          Veel ondernemers verdwalen op het internet. Ze hebben een website die traag is, onduidelijk is of
-          nergens te vinden is. Wij geloven dat dat niet hoeft.
-        </p>
-        <p>
-          {site.name} maakt websites die begrijpelijk zijn, snel laden en vooral uitnodigen om contact op te nemen.
-          Geen poespas, wel resultaat. En omdat je website niet meer in een laadkade hoeft, bouwen we met techniek die
-          ook over vijf jaar nog snel is.
-        </p>
-      </div>
+  {
+    about?.mission && (
+      <section class="py-16 sm:py-20">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">{about.mission.heading}</h2>
+          <div class="mt-6 space-y-4 text-brand-text/85">
+            {about.mission.paragraphs.map((paragraph) => (
+              <p>{paragraph}</p>
+            ))}
+          </div>
 
-      <dl class="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {
-          stats.map((stat) => (
-            <div class="rounded-lg border border-black/10 bg-white/60 p-6">
-              <dt class="text-sm text-brand-text/70">{stat.label}</dt>
-              <dd class="mt-1 text-3xl font-bold text-primary">{stat.value}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </div>
-  </section>
+          {stats.length > 0 && (
+            <dl class="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {stats.map((stat) => (
+                <div class="rounded-lg border border-black/10 bg-white/60 p-6">
+                  <dt class="text-sm text-brand-text/70">{stat.label}</dt>
+                  <dd class="mt-1 text-3xl font-bold text-primary">{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </div>
+      </section>
+    )
+  }
 
-  <section class="border-y border-black/10 bg-white/50 py-16 sm:py-20">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6">
-      <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Waar wij voor staan</h2>
-      <ul class="mt-12 grid gap-6 sm:grid-cols-2">
-        {
-          values.map((value) => (
-            <li class="rounded-lg border border-black/10 bg-neutral-bg p-6">
-              <h3 class="text-lg font-semibold text-primary">{value.title}</h3>
-              <p class="mt-2 text-sm text-brand-text/80">{value.description}</p>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
+  {
+    values.length > 0 && (
+      <section class="border-y border-black/10 bg-white/50 py-16 sm:py-20">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
+            {about?.values?.heading ?? 'Waar wij voor staan'}
+          </h2>
+          <ul class="mt-12 grid gap-6 sm:grid-cols-2">
+            {values.map((value) => (
+              <li class="rounded-lg border border-black/10 bg-neutral-bg p-6">
+                <h3 class="text-lg font-semibold text-primary">{value.title}</h3>
+                <p class="mt-2 text-sm text-brand-text/80">{value.description}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
 
-  <section class="py-16 sm:py-20">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6">
-      <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Het team</h2>
-      <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {
-          team.map((member) => (
-            <li class="flex flex-col rounded-lg border border-black/10 bg-white/60 p-6">
-              <div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-xl font-bold text-primary" aria-hidden="true">
-                {member.name.charAt(0)}
-              </div>
-              <h3 class="mt-4 text-lg font-semibold text-primary">{member.name}</h3>
-              <p class="text-sm font-medium text-brand-text/70">{member.role}</p>
-              <p class="mt-3 flex-1 text-sm text-brand-text/80">{member.bio}</p>
-              <a
-                href={member.linkedin}
-                target="_blank"
-                rel="noopener"
-                class="mt-4 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary-hover"
-                aria-label={`Bekijk het LinkedIn-profiel van ${member.name} (opent in een nieuw tabblad)`}
-              >
-                LinkedIn-profiel
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
+  {
+    team.length > 0 && (
+      <section class="py-16 sm:py-20">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
+            {about?.team?.heading ?? 'Het team'}
+          </h2>
+          <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {team.map((member) => (
+              <li class="flex flex-col rounded-lg border border-black/10 bg-white/60 p-6">
+                <div
+                  class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-xl font-bold text-primary"
+                  aria-hidden="true"
+                >
+                  {member.name.charAt(0)}
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-primary">{member.name}</h3>
+                <p class="text-sm font-medium text-brand-text/70">{member.role}</p>
+                {member.bio && <p class="mt-3 flex-1 text-sm text-brand-text/80">{member.bio}</p>}
+                {member.link && (
+                  <a
+                    href={member.link}
+                    target="_blank"
+                    rel="noopener"
+                    class="mt-4 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary-hover"
+                    aria-label={`${member.linkLabel ?? 'Profiel'} van ${member.name} (opent in een nieuw tabblad)`}
+                  >
+                    {member.linkLabel ?? 'Profiel'}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
 
   <CtaBanner />
 </BaseLayout>

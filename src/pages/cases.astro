@@ -1,32 +1,39 @@
 ---
+/**
+ * Overzicht van `content.work.items`. Route blijft `/cases`, maar de inhoud is
+ * generiek: cases, projecten, portfolio of referenties.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import CasesSection from '../components/sections/CasesSection.astro';
+import WorkSection from '../components/sections/WorkSection.astro';
 import TestimonialsSection from '../components/sections/TestimonialsSection.astro';
 import CtaBanner from '../components/sections/CtaBanner.astro';
 import siteConfig from '../config/site.config';
 
-const { cases } = siteConfig.content;
+const { content } = siteConfig;
+const items = content.work?.items ?? [];
+const meta = content.pages.cases;
 ---
 
 <BaseLayout
-  title="Cases"
-  description={`Cases van ${siteConfig.site.name}: resultaten van websites voor zzp'ers en kleine bedrijven in de Randstad.`}
-  breadcrumbs={[{ name: 'Cases', href: '/cases' }]}
+  title={meta?.title ?? 'Cases'}
+  description={meta?.description}
+  breadcrumbs={meta ? [{ name: meta.title, href: '/cases' }] : undefined}
 >
   <section class="border-b border-black/10 bg-white/50 py-16 sm:py-20">
     <div class="mx-auto max-w-3xl px-4 sm:px-6">
-      <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Cases</h1>
-      <p class="mt-6 text-lg text-brand-text/80">
-        Echte ondernemers, echte cijfers. Bekijk wat een nieuwe website voor hen opleverde — en welk probleem we
-        eerst moesten oplossen.
-      </p>
-      <p class="mt-4 text-sm text-brand-text/70">
-        {cases.length} cases uit {siteConfig.location.areaServed.join(', ')}.
-      </p>
+      <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">{meta?.title ?? 'Cases'}</h1>
+      {meta?.intro && <p class="mt-6 text-lg text-brand-text/80">{meta.intro}</p>}
+      {
+        siteConfig.location?.areaServed?.length && (
+          <p class="mt-4 text-sm text-brand-text/70">
+            {items.length} {meta?.title?.toLowerCase() ?? 'items'} uit {siteConfig.location.areaServed.join(', ')}.
+          </p>
+        )
+      }
     </div>
   </section>
 
-  <CasesSection />
+  <WorkSection />
   <TestimonialsSection />
   <CtaBanner />
 </BaseLayout>

@@ -1,82 +1,15 @@
 /**
- * SINGLE SOURCE OF TRUTH
- * ----------------------
- * Rebrand the entire website by editing this file only.
- * No `.astro` file may contain hardcoded business data.
+ * SINGLE SOURCE OF TRUTH — alleen de gegevens
+ * ------------------------------------------
+ * Types staan in `site.types.ts`; de tekstblokken staan in `content/`.
+ * Rebrande de site door deze bestanden aan te passen — geen `.astro`-bestand
+ * bevat hardcoded bedrijfsdata.
+ *
+ * De onderstaande waarden zijn bewust herkenbaar als PLACEHOLDERS, zodat ze
+ * niet per ongeluk live gaan.
  */
-
-export interface ThemeConfig {
-  /** Merkprimary. Wordt doorgegeven als `--color-primary` (Tailwind: `bg-primary`). */
-  primaryColor: string;
-  primaryHover: string;
-  neutralBg: string;
-  textColor: string;
-}
-
-export interface SiteConfig {
-  theme: ThemeConfig;
-  site: {
-    name: string;
-    legalName: string;
-    slogan: string;
-    description: string;
-    /** Canonical basis, zonder trailing slash. bv. 'https://studiobruikbaar.nl' */
-    url: string;
-  };
-  legal: {
-    kvk: string;
-    btw: string;
-    privacyPolicyUrl: string;
-    termsUrl: string;
-  };
-  contact: {
-    /** Internationaal formaat, bv. '+31612345678' */
-    phone: string;
-    email: string;
-    bookingUrl: string;
-    /** Endpoint waar het contactformulier naartoe post (bv. Formspree). */
-    formEndpoint: string;
-  };
-  location: {
-    streetAddress: string;
-    postalCode: string;
-    addressLocality: string;
-    addressCountry: 'NL';
-    geo: { latitude: number; longitude: number };
-    areaServed: string[];
-  };
-  openingHours: Array<{ days: string[]; opens: string; closes: string }>;
-  socials: {
-    linkedin: string;
-    googleMaps: string;
-    kvkRegistry: string;
-    instagram?: string;
-  };
-  content: {
-    navigation: Array<{ label: string; href: string }>;
-    ctaButton: { label: string; href: string };
-    heroSecondaryCta: { label: string; href: string };
-    services: Array<{
-      id: string;
-      title: string;
-      shortDesc: string;
-      deliverables: string[];
-      priceTier: string;
-    }>;
-    process: Array<{ step: number; title: string; description: string }>;
-    cases: Array<{
-      client: string;
-      title: string;
-      challenge: string;
-      result: string;
-      metrics: string[];
-    }>;
-    team: Array<{ name: string; role: string; bio: string; linkedin: string }>;
-    testimonials: Array<{ author: string; company: string; quote: string }>;
-    faq: Array<{ question: string; answer: string }>;
-    stats: Array<{ value: string; label: string }>;
-  };
-}
+import type { SiteConfig } from './site.types';
+import { features, process, work, testimonials, faq, stats, about } from './content';
 
 const siteConfig: SiteConfig = {
   theme: {
@@ -84,38 +17,47 @@ const siteConfig: SiteConfig = {
     primaryHover: '#5F0701',
     neutralBg: '#FDFBF7',
     textColor: '#1C1917',
+    fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif",
   },
 
   site: {
-    name: 'Studio Bruikbaar',
-    legalName: 'Studio Bruikbaar B.V.',
-    slogan: 'Websites die verkopen voor ondernemers',
+    name: 'Voorbeeld Bedrijf',
+    slogan: 'Een heldere propositie in één zin',
     description:
-      'Studio Bruikbaar bouwt snelle, converterende websites voor zzp\u2019ers en kleine bedrijven in de Randstad. Van strategie tot livegang in drie weken.',
-    url: 'https://studiobruikbaar.nl',
+      'Vervang deze beschrijving door wat jou bedrijf doet, voor wie en waarom. Deze tekst verschijnt onder de H1, in de OpenGraph-tags en in de structured data.',
+    url: 'https://example.nl',
+    locale: 'nl-NL',
+    ogImage: '/og-image.svg',
+    favicon: '/favicon.svg',
+  },
+
+  business: {
+    schemaType: 'Organization',
+    currency: 'EUR',
   },
 
   legal: {
-    kvk: '87654321',
-    btw: 'NL863456789B01',
+    kvk: '00000000',
+    btw: 'NL000000000B01',
     privacyPolicyUrl: '/privacy',
     termsUrl: '/voorwaarden',
   },
 
   contact: {
-    phone: '+31612345678',
-    email: 'hallo@studiobruikbaar.nl',
-    bookingUrl: 'https://cal.com/studio-bruikbaar/introductie',
-    formEndpoint: 'https://formspree.io/f/xjvqzkwd',
+    phone: '+31000000000',
+    email: 'info@example.nl',
+    bookingUrl: 'https://example.com/boeken',
+    formEndpoint: 'https://formspree.io/f/REPLACE_ME',
+    formIntro: 'Vul het formulier in, dan nemen wij contact op.',
   },
 
   location: {
-    streetAddress: 'Keizersgracht 241',
-    postalCode: '1016 EA',
+    streetAddress: 'Voorbeeldstraat 1',
+    postalCode: '1000 AA',
     addressLocality: 'Amsterdam',
     addressCountry: 'NL',
     geo: { latitude: 52.3765, longitude: 4.8832 },
-    areaServed: ['Nederland', 'Randstad', 'Amsterdam', 'Utrecht', 'Den Haag'],
+    areaServed: ['Nederland'],
   },
 
   openingHours: [
@@ -124,10 +66,9 @@ const siteConfig: SiteConfig = {
   ],
 
   socials: {
-    linkedin: 'https://www.linkedin.com/company/studio-bruikbaar',
-    googleMaps: 'https://www.google.com/maps/place/Keizersgracht+241+Amsterdam',
-    kvkRegistry: 'https://www.kvk.nl/orderstraat-product-kiezen/?kvk=87654321',
-    instagram: 'https://www.instagram.com/studiobruikbaar',
+    linkedin: 'https://www.linkedin.com/company/example',
+    googleMaps: 'https://www.google.com/maps',
+    instagram: 'https://www.instagram.com/example',
   },
 
   content: {
@@ -137,118 +78,75 @@ const siteConfig: SiteConfig = {
       { label: 'Over ons', href: '/over-ons' },
       { label: 'Contact', href: '/contact' },
     ],
-    ctaButton: { label: 'Plan een kennismaking', href: '/contact' },
+    ctaButton: { label: 'Neem contact op', href: '/contact' },
     heroSecondaryCta: { label: 'Bekijk onze cases', href: '/cases' },
 
-    services: [
+    hero: {
+      badge: 'Welkom bij ons',
+    },
+
+    sections: ['hero', 'features', 'process', 'work', 'testimonials', 'faq', 'cta'],
+
+    pages: {
+      diensten: {
+        title: 'Diensten',
+        intro: 'Wat wij kunnen doen. Elk onderdeel heeft een heldere omschrijving.',
+        description: 'Het aanbod van Voorbeeld Bedrijf.',
+      },
+      cases: {
+        title: 'Cases',
+        intro: 'Een selectie van projecten en de resultaten die ze opleverden.',
+        description: 'Cases van Voorbeeld Bedrijf.',
+      },
+      'over-ons': {
+        title: 'Over ons',
+        intro: 'Maak kennis met het team en de manier van werken.',
+        description: 'Over Voorbeeld Bedrijf.',
+      },
+      contact: {
+        title: 'Contact',
+        intro: 'Je vraag staat klaar, of je nu belt, mailt of het formulier gebruikt.',
+        description: 'Contactgegevens van Voorbeeld Bedrijf.',
+      },
+    },
+
+    features,
+    process,
+    work,
+    testimonials,
+    faq,
+    stats,
+    about,
+
+    contactPage: {
+      title: 'Contact',
+      intro: 'Je vraag staat klaar, of je nu belt, mailt of het formulier gebruikt.',
+      columnsHeading: 'Bedrijfsgegevens',
+      formHeading: 'Stuur een bericht',
+    },
+
+    extraPages: [
       {
-        id: 'websites',
-        title: 'Moderne bedrijfswebsite',
-        shortDesc: 'Een snelle, responsieve website die bezoekers overtuigt om contact op te nemen.',
-        deliverables: [
-          'Uitwerkelijk in Figma',
-          'Responsief design (mobiel, tablet, desktop)',
-          'Astro + Tailwind, razendsnel geladen',
-          'Basis SEO en toegankelijkheidscheck',
-          'Eenvoudig beheer via één configuratiebestand',
+        slug: 'privacy',
+        title: 'Privacyverklaring',
+        intro: 'Hoe wij met jouw gegevens omgaan.',
+        body: [
+          {
+            heading: 'Welke gegevens wij verwerken',
+            text: 'Vervang deze alinea door de werkelijke verwerking van persoonsgegevens.',
+          },
+          {
+            heading: 'Waarom wij die gegevens verwerken',
+            text: 'Vervang deze alinea door de grondslag en het doel van de verwerking.',
+          },
         ],
-        priceTier: 'vanaf €1.950',
       },
       {
-        id: 'webshops',
-        title: 'Webshop & online verkopen',
-        shortDesc: 'Een verkoopklaar platform met betaling, voorraad en koppelingen naar je boekhouding.',
-        deliverables: [
-          'Kassysteem met iDEAL en creditcard',
-          'Productbeheer en voorraadsync',
-          'Automatische orderbevestigingen',
-          'Koppeling met boekhoudsoftware',
-          'Training in beheer',
-        ],
-        priceTier: 'vanaf €3.900',
+        slug: 'voorwaarden',
+        title: 'Algemene voorwaarden',
+        intro: 'De afspraken die gelden bij gebruik van deze website.',
+        body: ['Vervang deze alinea door de werkelijke voorwaarden.'],
       },
-      {
-        id: 'seo',
-        title: 'Lokale SEO & vindbaarheid',
-        shortDesc: 'Beter gevonden worden in Google, ook wanneer er lokaal naar je dienst gezocht wordt.',
-        deliverables: [
-          'Lokale SEO-optimalisatie',
-          'Google Business Profile beheer',
-          'Structurele data voor Google',
-          'Maandelijkse rapportage',
-        ],
-        priceTier: 'vanaf €450 per maand',
-      },
-      {
-        id: 'onderhoud',
-        title: 'Onderhoud & optimalisatie',
-        shortDesc: 'Wij houden je website snel, veilig en foutloos, zodat je er niet aan hoeft te denken.',
-        deliverables: [
-          'Maandelijkse updates en back-ups',
-          'Toegankelijkheids- en snelheidsmonitoring',
-          'Directe lijn met je vaste contactpersoon',
-          'Kosteloos content aanpassen',
-        ],
-        priceTier: 'vanaf €149 per maand',
-      },
-    ],
-
-    process: [
-      { step: 1, title: 'Kick-off & strategie', description: 'We bespreken je doelgroep, concurrenten en gewenste acties. Binnen een week heb je een duidelijke koers.' },
-      { step: 2, title: 'Ontwerp & bouw', description: 'Je krijgt eerst een klikbaar ontwerp. Na akkoord bouwen we de website in snelle, moderne techniek.' },
-      { step: 3, title: 'Testen & optimaliseren', description: 'We testen op snelheid, mobiel en toegankelijkheid en verbeteren waar dat de conversie oplevert.' },
-      { step: 4, title: 'Lanceren & beheren', description: 'We gaan live, dragen alles over en blijven bereikbaar voor vragen, aanpassingen en groei.' },
-    ],
-
-    cases: [
-      {
-        client: 'Bakkerij De Korenbloem',
-        title: 'Van buurtbakkerij naar landelijke webshop',
-        challenge: 'Een fysieke bakkerij wilde online bestellingen aannemen zonder een zwaar platform.',
-        result: 'Een snelle bestelwebsite met iDEAL en ophalen of bezorgen als optie.',
-        metrics: ['+38% online omzet', '1,1s laadtijd', '4,9\u2605 beoordeling'],
-      },
-      {
-        client: 'Bureau Zandvliet',
-        title: 'Vakkundig online zichtbaar in de Randstad',
-        challenge: 'Een architectenbureau zonder website, volledig afhankelijk van mond-op-mond verwijzingen.',
-        result: 'Een portfolio-site met lokale SEO die structurele data aan Google voedt.',
-        metrics: ['#1 in lokale zoekresultaten', '3x aanvragen per maand'],
-      },
-      {
-        client: 'Fysiotherapiepraktijk Van Dam',
-        title: 'Online afspraken inplannen',
-        challenge: 'De praktijk werd telefonisch overspoeld en was slecht bereikbaar.',
-        result: 'Een snelle site met directe online agenda en duidelijke behandelingen.',
-        metrics: ['-65% telefoontjes', '2,4s \u2192 0,8s laadtijd'],
-      },
-    ],
-
-    team: [
-      { name: 'Sanne de Vries', role: 'Oprichter & webdesigner', bio: 'Sanne combineert typografie met conversie: mooi én effectief. Al tien jaar websites voor ondernemers.', linkedin: 'https://www.linkedin.com/in/sanne-de-vries' },
-      { name: 'Bram Hoekstra', role: 'Frontend developer', bio: 'Bram bouwt razendsnelle websites met Astro en Tailwind, altijd met toegankelijkheid als uitgangspunt.', linkedin: 'https://www.linkedin.com/in/bram-hoekstra' },
-      { name: 'Fleur Jansen', role: 'SEO & content', bio: 'Fleur zorgt dat een website niet alleen mooi is, maar ook gevonden wordt. Specialisme: lokale SEO.', linkedin: 'https://www.linkedin.com/in/fleur-jansen' },
-    ],
-
-    testimonials: [
-      { author: 'Yara el Amrani', company: 'Bakkerij De Korenbloem', quote: 'Onze online bestellingen lopen nu gewoon door. Binnen een week na livegang wisten we al dat het de moeite waard was.' },
-      { author: 'Joost van Dam', company: 'Fysiotherapiepraktijk Van Dam', quote: 'Duidelijk, snel en geen gedoe. Ze nemen gewoon de telefoon over als ik iets wil aanpassen.' },
-      { author: 'Marijke Zandvliet', company: 'Bureau Zandvliet', quote: 'We krijgen nu aanvragen van opdrachtgevers die ons nog nooit hebben gezien. Dat was precies het doel.' },
-    ],
-
-    faq: [
-      { question: 'Hoe lang duurt het bouwen van een website?', answer: 'De meeste websites gaan binnen drie tot vier weken live. We plannen vooraf duidelijke momenten van oplevering, zodat je weet waar je aan toe bent.' },
-      { question: 'Wat kost een website bij jullie?', answer: 'Een moderne bedrijfswebsite start vanaf €1.950. De uiteindelijke prijs hangt af van het aantal pagina\u2019s en functies, zoals een webshop of online agenda.' },
-      { question: 'Kan ik de website zelf aanpassen?', answer: 'Ja. Je krijgt een overzichtelijke training en toegang tot een centrale configuratie. Teksten, kleuren en pagina\u2019s zijn daar eenvoudig aan te passen.' },
-      { question: 'Wat gebeurt er na de livegang?', answer: 'Je bent niet aan ons vastgebonden. We blijven bereikbaar voor onderhoud, maar je kunt de website ook zelf door een andere partij laten beheren.' },
-      { question: 'In welk gebied zijn jullie actief?', answer: 'Wij werken voor ondernemers in heel Nederland, met de nadruk op de Randstad. Op afstand werken we net zo goed als bij jou op locatie.' },
-    ],
-
-    stats: [
-      { value: '120+', label: 'Websites geleverd' },
-      { value: '3 weken', label: 'Gemiddelde doorlooptijd' },
-      { value: '1,0s', label: 'Gemiddelde laadtijd' },
-      { value: '9,6/10', label: 'Klantwaardering' },
     ],
   },
 };
